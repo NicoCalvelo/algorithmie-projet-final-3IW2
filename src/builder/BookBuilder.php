@@ -3,6 +3,7 @@
 namespace App\Builder;
 
 use App\Models\Book;
+use App\Singleton\Archive;
 
 /**
  * Cette classe gère la persistance des livres
@@ -43,6 +44,9 @@ class BookBuilder
         echo "\033[2J\033[;H";
         echo "Livre créé avec succès !\n";
         $book->display(1);
+
+        // ajout ligne dans l'historique
+        Archive::getInstance()->addHistory("Création du livre : " . $book->getTitle());
 
         // save book to json file
         $this->saveBookToDB($book);
@@ -129,6 +133,9 @@ class BookBuilder
             case '9':
                 $this->saveBookToDB($book);
                 echo PHP_EOL . "Livre sauvegardé avec succès !\n";
+                // ajout ligne dans l'historique
+                Archive::getInstance()->addHistory("Modification du livre : " . $book->getTitle());
+                // On relance le script
                 userInteract();
                 break;
             case '0':
@@ -313,11 +320,15 @@ class BookBuilder
         file_put_contents(__DIR__ . '/../../data/books.json', json_encode($newBooks, JSON_PRETTY_PRINT));
 
         echo "Livre supprimé avec succès !\n";
+
+        // ajout ligne dans l'historique
+        Archive::getInstance()->addHistory("Suppression du livre : " . $book->getTitle());
     }
 
     // fonction pour sauvegarder les livres dans le fichier json
     // utilise pour la fonction de trie des livres
-    public function saveBooks($books){
+    public function saveBooks($books)
+    {
         file_put_contents(__DIR__ . '/../../data/books.json', json_encode($books, JSON_PRETTY_PRINT));
     }
 }

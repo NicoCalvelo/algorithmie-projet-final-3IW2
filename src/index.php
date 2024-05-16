@@ -1,6 +1,7 @@
 <?php
 
 use App\Builder\BookBuilder;
+use App\Singleton\Archive;
 use App\Singleton\Librarian;
 
 require_once __DIR__ . "/../vendor/autoload.php";
@@ -13,7 +14,8 @@ function userInteract()
         echo "2. Afficher tous les livres\n";
         echo "3. Rechercher un livre\n";
         echo "4. Trier les livres\n";
-        echo "5. Quitter\n";
+        echo "5. Afficher l'historique\n";
+        echo "6. Quitter\n";
         echo "Votre choix : ";
 
         $choice = trim(fgets(STDIN));
@@ -39,8 +41,22 @@ function userInteract()
                 break;
             case '4':
                 // Trier les livres
-                Librarian::getInstance()->sortBooks();
+                $books = Librarian::getInstance()->sortBooks();
+                displayBooksOptions($books);
+                break;
             case '5':
+                // Afficher l'historique
+                $history = Archive::getInstance()->getHistory();
+                if (count($history) > 0) {
+                    echo "Historique des actions : \n";
+                    foreach ($history as $action) {
+                        echo "  " . $action . "\n";
+                    }
+                } else {
+                    echo "Aucune action n'a été enregistrée dans l'historique.\n";
+                }
+                break;
+            case '6':
                 echo "Au revoir !\n";
                 exit(0);
             default:

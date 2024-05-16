@@ -155,6 +155,10 @@ class Librarian
             }
         }
 
+
+        // ajout ligne dans l'historique
+        Archive::getInstance()->addHistory("Une recherche a été effectuée sur le champ \"$field\" avec la valeur \"$value\"");
+
         return $result;
     }
 
@@ -164,7 +168,7 @@ class Librarian
      * On demande si on veut trier les livres dans l'ordre croissant ou décroissant
      * On trie les livres, puis on les sauvegarde et on les affiche
      */
-    public function sortBooks(): void
+    public function sortBooks(): array
     {
         // les livres doivent pouvoir être triés dans l’ordre croissant ou décroissant 
         // en utilisant un tri fusion sur n’importe quelle colonne (une colonne à la fois), donc le nom, 
@@ -279,7 +283,16 @@ class Librarian
         foreach ($sortedBooksJSON as $book) {
             $this->books[] = new Book($book);
         }
+
+
+        // ajout ligne dans l'historique
+        Archive::getInstance()->addHistory("Un tri a été effectué sur les colonnes " .
+            implode(', ', array_values($sortProperties)) .
+            " dans l'ordre " . ($asc ? 'croissant' : 'décroissant'));
+
+        // on affiche les livres
         $this->displayBooks($this->books);
-        displayBooksOptions($this->books);
+        // on affiche les options des livres
+        return $this->books;
     }
 }
