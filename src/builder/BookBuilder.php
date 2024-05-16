@@ -3,12 +3,21 @@
 namespace App\Builder;
 
 use App\Models\Book;
-use App\Singleton\Librarian;
 
-
+/**
+ * Cette classe gère la persistance des livres
+ * 
+ * Seulement 3 methodes sont accessibles depuis l'extérieur de la classe :
+ *   - createBook() : pour créer un livre
+ *   - modifyBook($book) : pour modifier un livre
+ *   - removeBook($book) : pour supprimer un livre
+ * 
+ * Les autres méthodes sont privées ( ce sont de setter et la methode de sauvegarde )
+ */
 class BookBuilder
 {
-    function createBook()
+    // fonction pour créer un livre, il l'affiche après la création
+    public function createBook()
     {
         echo "Création d'un livre...\n";
 
@@ -39,6 +48,7 @@ class BookBuilder
         $this->saveBookToDB($book);
     }
 
+    // fonction pour modifier un livre
     public function modifyBook($book): void
     {
         // clear console
@@ -59,120 +69,120 @@ class BookBuilder
         echo "Votre choix : ";
 
         $choice = trim(fgets(STDIN));
+        echo "\033[2J\033[;H";
         switch ($choice) {
             case '1':
-                echo "\033[2J\033[;H";
                 echo "Titre actuel : " . $book->getTitle() . PHP_EOL;
                 echo "Nouveau ";
-                (new BookBuilder())->choseTitle($book);
+                $this->choseTitle($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
             case '2':
-                echo "\033[2J\033[;H";
                 echo "Description actuelle : " . $book->getDescription() . PHP_EOL;
                 echo "Nouvelle ";
-                (new BookBuilder())->choseDescription($book);
+                $this->choseDescription($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
             case '3':
-                echo "\033[2J\033[;H";
                 echo "Auteur actuel : " . $book->getAuthor() . PHP_EOL;
                 echo "Nouveau ";
-                (new BookBuilder())->choseAuthor($book);
+                $this->choseAuthor($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
             case '4':
-                echo "\033[2J\033[;H";
                 echo "Catégorie actuelle : " . $book->getCategory() . PHP_EOL;
                 echo "Nouvelle ";
-                (new BookBuilder())->choseCategory($book);
+                $this->choseCategory($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
             case '5':
-                echo "\033[2J\033[;H";
                 echo "Date de publication actuelle : " . $book->getPublishedAt() . PHP_EOL;
                 echo "Nouvelle ";
-                (new BookBuilder())->chosePublishedAt($book);
+                $this->chosePublishedAt($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
             case '6':
-                echo "\033[2J\033[;H";
                 echo "Langue actuelle : " . $book->getLang() . PHP_EOL;
                 echo "Nouveau ";
-                (new BookBuilder())->choseLanguage($book);
+                $this->choseLanguage($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
             case '7':
-                echo "\033[2J\033[;H";
                 echo "Prix actuel : " . $book->getPrice() . PHP_EOL;
                 echo "Nouveau ";
-                (new BookBuilder())->chosePrice($book);
+                $this->chosePrice($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
             case '8':
-                echo "\033[2J\033[;H";
                 echo "Disponibilité actuelle : " . ($book->getIsAvailable() ? "Disponible" : "Non disponible") . PHP_EOL;
-                (new BookBuilder())->askIsAvailable($book);
+                $this->askIsAvailable($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
             case '9':
                 $this->saveBookToDB($book);
                 echo PHP_EOL . "Livre sauvegardé avec succès !\n";
+                userInteract();
                 break;
             case '0':
                 echo "Quitter...\n";
+                userInteract();
                 break;
             default:
                 echo "Choix invalide. Veuillez choisir un nombre entre 1 et 9.\n";
-                $this->modifyBook($book);
                 break;
         }
     }
 
-    function choseTitle(&$book)
+    // fonction pour choisir le titre du livre
+    private function choseTitle(&$book)
     {
         echo "Titre : ";
         $title = trim(fgets(STDIN));
         $book->setTitle($title);
     }
 
-    function choseDescription(&$book)
+    // fonction pour choisir la description du livre
+    private function choseDescription(&$book)
     {
         echo "Description : ";
         $description = trim(fgets(STDIN));
         $book->setDescription($description);
     }
 
-    function choseAuthor(&$book)
+    // fonction pour choisir l'auteur du livre
+    private function choseAuthor(&$book)
     {
         echo "Auteur : ";
         $author = trim(fgets(STDIN));
         $book->setAuthor($author);
     }
 
-    function chosePublishedAt(&$book)
+    // fonction pour choisir la date de publication du livre
+    private function chosePublishedAt(&$book)
     {
         echo "Date de publication : ";
         $publishedAt = trim(fgets(STDIN));
         $book->setPublishedAt($publishedAt);
     }
 
-    function chosePrice(&$book)
+    // fonction pour choisir le prix du livre
+    private function chosePrice(&$book)
     {
         echo "Prix : ";
         $price = trim(fgets(STDIN));
         $book->setPrice((float) $price);
     }
 
-    function choseCategory(&$book)
+    // fonction pour choisir la catégorie du livre
+    private function choseCategory(&$book)
     {
         $choice = null;
         echo "Catégorie : \n";
@@ -199,7 +209,8 @@ class BookBuilder
         }
     }
 
-    function choseLanguage(&$book)
+    // fonction pour choisir la langue du livre
+    private function choseLanguage(&$book)
     {
         $choice = null;
         echo "Langue : \n";
@@ -226,7 +237,8 @@ class BookBuilder
         }
     }
 
-    function askIsAvailable(&$book)
+    // fonction pour choisir la disponibilité du livre
+    private function askIsAvailable(&$book)
     {
         $choice = null;
         echo "Il y a des exemplaires disponibles ? (oui/non) : ";
@@ -250,8 +262,8 @@ class BookBuilder
         }
     }
 
-
-    function saveBookToDB($book)
+    // fonction pour sauvegarder le livre dans le fichier json
+    private function saveBookToDB($book)
     {
         // create data directory if not exists
         if (!is_dir(__DIR__ . '/../../data')) {
@@ -273,7 +285,7 @@ class BookBuilder
                     $books[] = $b->toArray();
                 }
             }
-        }else{
+        } else {
             if (count($books) > 0) {
                 $book->setId($books[count($books) - 1]['id'] + 1);
             } else {
@@ -284,9 +296,10 @@ class BookBuilder
 
         // get all books from file
         $books[] = $book->toArray();
-        file_put_contents(__DIR__ . '/../../data/books.json', json_encode($books, JSON_PRETTY_PRINT));
+        $this->saveBooks($books);
     }
 
+    // fonction pour supprimer un livre
     public function removeBook($book): void
     {
         $books = json_decode(file_get_contents(__DIR__ . '/../../data/books.json'), true);
@@ -300,5 +313,11 @@ class BookBuilder
         file_put_contents(__DIR__ . '/../../data/books.json', json_encode($newBooks, JSON_PRETTY_PRINT));
 
         echo "Livre supprimé avec succès !\n";
+    }
+
+    // fonction pour sauvegarder les livres dans le fichier json
+    // utilise pour la fonction de trie des livres
+    public function saveBooks($books){
+        file_put_contents(__DIR__ . '/../../data/books.json', json_encode($books, JSON_PRETTY_PRINT));
     }
 }

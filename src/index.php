@@ -7,8 +7,6 @@ require_once __DIR__ . "/../vendor/autoload.php";
 
 function userInteract()
 {
-    echo "\033[2J\033[;H";
-
     $choice = null;
     while ($choice === null) {
         echo "1. Créer un livre\n";
@@ -23,21 +21,24 @@ function userInteract()
         echo "\033[2J\033[;H";
         switch ($choice) {
             case '1':
+                // Creation d'un livre
                 $bookBuilder = new BookBuilder();
                 $bookBuilder->createBook();
                 break;
             case '2':
+                // Affichage de tous les livres
                 echo "Affichage de tous les livres...\n\n";
                 $books = Librarian::getInstance()->getBooks();
                 Librarian::getInstance()->displayBooks($books);
                 displayBooksOptions($books);
-                // Execute code for Option 2
                 break;
             case '3':
-                $books = Librarian::getInstance()->searchBook();
+                // Recherche d'un livre
+                $books = Librarian::getInstance()->userSearchBooks();
                 displayBooksOptions($books);
                 break;
             case '4':
+                // Trier les livres
                 Librarian::getInstance()->sortBooks();
             case '5':
                 echo "Au revoir !\n";
@@ -50,9 +51,6 @@ function userInteract()
         }
     }
 }
-
-userInteract();
-
 
 function displayBooksOptions($unindexedBooks)
 {
@@ -68,16 +66,17 @@ function displayBooksOptions($unindexedBooks)
     echo PHP_EOL . "Sélectionnez un livre pour plus des options ( 0 pour quitter ) : ";
     $choice = trim(fgets(STDIN));
     if ($choice === '0') {
-        exit(0);
+        echo "\033[2J\033[;H";
+        return userInteract();
     }
 
     if (isset($books[$choice])) {
         displayBookOptions($books[$choice], $unindexedBooks);
     } else {
         echo "Livre non trouvé.\n";
+        displayBooksOptions($unindexedBooks);
     }
 }
-
 
 function displayBookOptions($book, $unindexedBooks)
 {
@@ -123,3 +122,7 @@ function displayBookOptions($book, $unindexedBooks)
             break;
     }
 }
+
+
+echo "\033[2J\033[;H";
+userInteract();
