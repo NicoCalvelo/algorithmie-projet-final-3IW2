@@ -5,7 +5,7 @@ namespace App\Models;
 class Book
 {
 
-    protected int $id;
+    protected ?int $id = null;
     protected string $title;
     protected string $description;
     protected string $author;
@@ -28,7 +28,7 @@ class Book
         }
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }

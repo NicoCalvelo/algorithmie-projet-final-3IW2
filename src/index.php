@@ -15,7 +15,8 @@ function userInteract()
         echo "3. Rechercher un livre\n";
         echo "4. Trier les livres\n";
         echo "5. Afficher l'historique\n";
-        echo "6. Quitter\n";
+        echo "- - - - - - -\n";
+        echo "0. Quitter\n";
         echo "Votre choix : ";
 
         $choice = trim(fgets(STDIN));
@@ -26,6 +27,11 @@ function userInteract()
                 // Creation d'un livre
                 $bookBuilder = new BookBuilder();
                 $bookBuilder->createBook();
+                echo "- - - - - - -" . PHP_EOL;
+                echo "Appuyez sur Entrée pour revenir au menu principal...";
+                fgets(STDIN);
+                echo "\033[2J\033[;H";
+                userInteract();
                 break;
             case '2':
                 // Affichage de tous les livres
@@ -50,13 +56,18 @@ function userInteract()
                 if (count($history) > 0) {
                     echo "Historique des actions : \n";
                     foreach ($history as $action) {
-                        echo "  " . $action . "\n";
+                        echo "  - " . $action . "\n";
                     }
                 } else {
                     echo "Aucune action n'a été enregistrée dans l'historique.\n";
                 }
+                echo "- - - - - - -" . PHP_EOL;
+                echo "Appuyez sur Entrée pour revenir au menu principal...";
+                fgets(STDIN);
+                echo "\033[2J\033[;H";
+                userInteract();
                 break;
-            case '6':
+            case '0':
                 echo "Au revoir !\n";
                 exit(0);
             default:
@@ -100,7 +111,8 @@ function displayBookOptions($book, $unindexedBooks)
     echo "1. Afficher les détails" . PHP_EOL;
     echo "2. Modifier le livre" . PHP_EOL;
     echo "3. Supprimer le livre" . PHP_EOL;
-    echo "4. Retourner à la liste des livres\n";
+    echo "- - - - - - -" . PHP_EOL;
+    echo "9. Retourner à la liste des livres\n";
     echo "0. Quitter\n";
     echo "Votre choix : ";
 
@@ -122,8 +134,10 @@ function displayBookOptions($book, $unindexedBooks)
             (new BookBuilder())->removeBook($book);
             userInteract();
             break;
-        case '4':
+        case '9':
             // Return to the list of books
+            echo "\033[2J\033[;H";
+            Librarian::getInstance()->displayBooks($unindexedBooks);
             displayBooksOptions($unindexedBooks);
             break;
         case '0':

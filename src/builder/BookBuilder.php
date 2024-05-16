@@ -75,62 +75,71 @@ class BookBuilder
         $choice = trim(fgets(STDIN));
         echo "\033[2J\033[;H";
         switch ($choice) {
-            case '1':
+            case '1' || 'Titre':
+                // Modification du titre
                 echo "Titre actuel : " . $book->getTitle() . PHP_EOL;
                 echo "Nouveau ";
                 $this->choseTitle($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
-            case '2':
+            case '2' || 'Description':
+                // Modification de la description
                 echo "Description actuelle : " . $book->getDescription() . PHP_EOL;
                 echo "Nouvelle ";
                 $this->choseDescription($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
-            case '3':
+            case '3' || 'Auteur':
+                // Modification de l'auteur
                 echo "Auteur actuel : " . $book->getAuthor() . PHP_EOL;
                 echo "Nouveau ";
                 $this->choseAuthor($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
-            case '4':
+            case '4' || 'Catégorie':
+                // Modification de la catégorie
                 echo "Catégorie actuelle : " . $book->getCategory() . PHP_EOL;
                 echo "Nouvelle ";
                 $this->choseCategory($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
-            case '5':
+            case '5' || 'Date de publication':
+                // Modification de la date de publication
                 echo "Date de publication actuelle : " . $book->getPublishedAt() . PHP_EOL;
                 echo "Nouvelle ";
                 $this->chosePublishedAt($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
-            case '6':
+            case '6' || 'Langue':
+                // Modification de la langue
                 echo "Langue actuelle : " . $book->getLang() . PHP_EOL;
                 echo "Nouveau ";
                 $this->choseLanguage($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
-            case '7':
+            case '7' || 'Prix':
+                // Modification du prix
                 echo "Prix actuel : " . $book->getPrice() . PHP_EOL;
                 echo "Nouveau ";
                 $this->chosePrice($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
-            case '8':
+            case '8' || 'Disponibilité':
+                // Modification de la disponibilité
                 echo "Disponibilité actuelle : " . ($book->getIsAvailable() ? "Disponible" : "Non disponible") . PHP_EOL;
                 $this->askIsAvailable($book);
                 echo "Modification effectuée avec succès !\n";
                 $this->modifyBook($book);
                 break;
-            case '9':
+            case '9' || 'Sauvegarder':
+                // Sauvegarde du livre
                 $this->saveBookToDB($book);
                 echo PHP_EOL . "Livre sauvegardé avec succès !\n";
                 // ajout ligne dans l'historique
@@ -138,7 +147,8 @@ class BookBuilder
                 // On relance le script
                 userInteract();
                 break;
-            case '0':
+            case '0' || 'Annuler':
+                // Annuler
                 echo "Quitter...\n";
                 userInteract();
                 break;
@@ -285,24 +295,27 @@ class BookBuilder
         $books = json_decode(file_get_contents(__DIR__ . '/../../data/books.json'), true);
 
         if ($book->getId() !== null) {
-            foreach ($books as $b) {
-                if ($b->getId() === $book->getId()) {
-                    $books[] = $book->toArray();
-                } else {
-                    $books[] = $b->toArray();
+            foreach ($books as $key => $b) {
+                if ($b['id'] === $book->getId()) {
+                    $books[$key] = $book->toArray();
+                    break;
                 }
             }
         } else {
             if (count($books) > 0) {
-                $book->setId($books[count($books) - 1]['id'] + 1);
+                $sortedBooks = $books;
+                usort($sortedBooks, function ($a, $b) {
+                    return $a['id'] <=> $b['id'];
+                });
+                $book->setId($sortedBooks[count($sortedBooks) - 1]['id'] + 1);
             } else {
                 // first book
                 $book->setId(1);
             }
+            // add book to books list
+            $books[] = $book->toArray();
         }
 
-        // get all books from file
-        $books[] = $book->toArray();
         $this->saveBooks($books);
     }
 
@@ -310,15 +323,19 @@ class BookBuilder
     public function removeBook($book): void
     {
         $books = json_decode(file_get_contents(__DIR__ . '/../../data/books.json'), true);
+        
         $newBooks = [];
+        // On parcours les livres et on ne garde pas celui à supprimer
         foreach ($books as $b) {
             if ($b['id'] !== $book->getId()) {
-                $newBooks[] = $b->toArray();
+                $newBooks[] = $b;
             }
         }
 
         file_put_contents(__DIR__ . '/../../data/books.json', json_encode($newBooks, JSON_PRETTY_PRINT));
 
+        //clear console
+        echo "\033[2J\033[;H";
         echo "Livre supprimé avec succès !\n";
 
         // ajout ligne dans l'historique
