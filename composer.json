@@ -1,0 +1,16 @@
+{
+    "name": "nicocalvelo/algorithmie",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Nico Calvelo",
+            "email": "dia.calvelo.nicolas@gmail.com"
+        }
+    ],
+    "require": {}
+}
